@@ -1,6 +1,8 @@
 from flask import Flask
 from markupsafe import escape
 import random
+import requests
+import json
 
 app=Flask(__name__)
 
@@ -62,6 +64,7 @@ def play_game(val):
     elif score==-1:
         player2_score+=1
 
+
     result_string=""
     result_string+="Player 1(Computer) tried "+player1
     result_string+="</br>Player 2(Human) tried "+player2
@@ -105,14 +108,17 @@ def get_weather(lat,lon):
     api_key="55566d956a0f278fa9d74b1e7ab4d355"
     url = "https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&appid=%s&units=metric" % (lat, lon, api_key)
 
-    data="dummy for "+str(lat)+ " " +str(lon)
+    # data="dummy for "+str(lat)+ " " +str(lon)
 
-    #response = requests.get(url)
-    #data = json.loads(response.text)
+    response = requests.get(url)
+    data = json.loads(response.text)
     print(lat,lon)
-
-    print(data)
-    return data
+    results_string="Temperature is"
+    results_string+= " "+str(data['current']['temp'])+"</br>"
+    results_string+="Humidity is  "+ str(data['current']['humidity'])
+    print(data['current']['temp'])
+    print(data['current']['humidity'])
+    return  results_string
 
 
 if __name__ == '__main__':
