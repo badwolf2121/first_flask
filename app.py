@@ -6,7 +6,7 @@ from flask import render_template
 import json
 
 app=Flask(__name__)
-app.secret_key = "rps_key"
+app.secret_key = "key2"
 
 
 
@@ -41,11 +41,19 @@ def play_game(val):
     #hand of human
     player2=val
     player2=dict_try[player2]
-
+    session["play_per_play"]["player1"].append(player1)
+    session["play_per_play"]["player2"].append(player2)
     print(" Player 1(Computer) tried ",player1)
     print(" Player 2(Human) tried ",player2)
+    print(session["play_per_play"]["player2"],session["play_per_play"]["player1"])
 
     result_string=""
+    result_string+="player1       player2"
+    for i in range (len(session["play_per_play"]["player1"])):
+        prev_player1=session["play_per_play"]["player1"][i]
+        prev_player2=session["play_per_play"]["player2"][i]  
+        result_string+="</br>"+prev_player1+"      "+prev_player2
+    result_string+="</br>____________________</br>"
     result_string+="Player 1(Computer) tried "+player1
     result_string+="</br>Player 2(Human) tried "+player2
 
@@ -81,11 +89,15 @@ def play_game(val):
 
 @app.route('/restart')
 def new_game():
-    print("Restarting")  
+    print("Restarting")     
     session.pop('player1_score',None)
     session.pop('player2_score',None)
+    session.pop('play_per_play',None)
     session["player1_score"]=0
     session["player2_score"]=0
+    session["play_per_play"]={}
+    session["play_per_play"]["player1"]=[]
+    session["play_per_play"]["player2"]=[]
     print("Scores are ",session["player1_score"],session["player2_score"])
     return "Score has been reset"
 
@@ -111,6 +123,7 @@ def logout():
     session.pop('user_name',None)
     session.pop('player1_score',None)
     session.pop('player2_score',None)
+    session.pop("play_per_play",None)
     return redirect(url_for("login"))
 
 @app.route('/postlogin',methods=['POST'])
@@ -120,6 +133,9 @@ def postlogin():
     session["user_name"] = user_name
     session['player1_score']=0 
     session['player2_score']=0 
+    session["play_per_play"]={}
+    session["play_per_play"]["player1"]=[]
+    session["play_per_play"]["player2"]=[]
     print("Got username ",user_name)
 
 
